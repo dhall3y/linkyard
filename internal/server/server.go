@@ -24,7 +24,8 @@ func NewServer(linksHandler *links.Handler) *Server {
 func (s *Server) registerRoutes() {
 	//register handleGetLinks as an http.Handler by wrapping it in http.HandlerFunc.
 	//mux.Handle("/", http.HandlerFunc(srv.handleGetLinks))
-	s.Mux.HandleFunc("/", s.linksHandler.HandleGetLinks)
+	s.Mux.HandleFunc("GET /", s.linksHandler.HandleGetLinks)
+	s.Mux.HandleFunc("POST /", s.linksHandler.HandleCreateLink)
 }
 
 func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {

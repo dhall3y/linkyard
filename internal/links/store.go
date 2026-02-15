@@ -49,3 +49,20 @@ func (s *Store) getLinks(ctx context.Context) ([]Link, error) {
 
 	return links, nil
 }
+
+func (s *Store) createLink(ctx context.Context, link Link) (*Link, error) {
+	query := `INSERT INTO links (name, url) VALUES ($1, $2) RETURNING name, url`
+
+	var newLink Link
+	err := s.db.QueryRow(ctx, query, link.Name, link.Url).Scan(&newLink.Name, &newLink.Url)
+	if err != nil {
+		if err == pgx.ErrNoRows {
+			fmt.Printf("no rows returned: %v", err)
+			return nil, err
+		}
+		fmt.Printf("insert error: %v", err)
+		return nil, err
+	}
+
+	return &newLink, nil
+}

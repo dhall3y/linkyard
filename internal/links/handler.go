@@ -29,3 +29,23 @@ func (h *Handler) HandleGetLinks(w http.ResponseWriter, r *http.Request) {
 
 	json.NewEncoder(w).Encode(links)
 }
+
+func (h *Handler) HandleCreateLink(w http.ResponseWriter, r *http.Request) {
+	ctx := r.Context()
+
+	var link Link
+	err := json.NewDecoder(r.Body).Decode(&link)
+	if err != nil {
+		fmt.Printf("decode error: %v", err)
+		return
+	}
+
+	newLink, err := h.store.createLink(ctx, link)
+	if err != nil {
+		fmt.Printf("insert error: %v", err)
+		http.Error(w, "internal server error", http.StatusInternalServerError)
+		return
+	}
+
+	json.NewEncoder(w).Encode(newLink)
+}
