@@ -33,9 +33,10 @@ func main() {
 		DB: conn,
 	}
 
-	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
-		srv.handleGetLinks(w, r)
-	})
+	mux := http.NewServeMux()
+	//register handleGetLinks as an http.Handler by wrapping it in http.HandlerFunc.
+	//mux.Handle("/", http.HandlerFunc(srv.handleGetLinks))
+	mux.HandleFunc("/", srv.handleGetLinks)
 
-	http.ListenAndServe(":8000", nil)
+	http.ListenAndServe(":8000", mux)
 }
