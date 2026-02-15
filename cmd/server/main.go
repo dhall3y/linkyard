@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"log"
 	"net/http"
@@ -12,8 +13,8 @@ import (
 )
 
 type Link struct {
-	name string
-	url  string
+	Name string
+	Url  string
 }
 
 func main() {
@@ -27,21 +28,21 @@ func main() {
 	}
 	defer conn.Close(context.Background())
 
-
 	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
 		ctx := r.Context()
+
 		rows, err := conn.Query(ctx, "SELECT name, url FROM links")
 		if err != nil {
 			fmt.Printf("query error : %v", err)
 			return
 		}
+
 		defer rows.Close()
 
 		var links []Link
-
 		for rows.Next() {
 			var newLink Link
-			err := rows.Scan(&newLink.name, &newLink.url)
+			err := rows.Scan(&newLink.Name, &newLink.Url)
 			if err != nil {
 				fmt.Printf("scan error: %v", err)
 				return
@@ -54,7 +55,7 @@ func main() {
 			return
 		}
 
-		fmt.Printf("links: %+v", links)
+		json.NewEncoder(w).Encode(links)
 	})
 	http.ListenAndServe(":8000", nil)
 }
