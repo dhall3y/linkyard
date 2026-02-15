@@ -5,8 +5,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
-
-	"github.com/jackc/pgx/v5"
 )
 
 type Link struct {
@@ -14,10 +12,10 @@ type Link struct {
 	Url  string
 }
 
-func getLinks(conn *pgx.Conn, ctx context.Context) ([]Link, error) {
+func (s *Server) getLinks(ctx context.Context) ([]Link, error) {
 	var links []Link
 
-	rows, err := conn.Query(ctx, "SELECT name, url FROM links")
+	rows, err := s.DB.Query(ctx, "SELECT name, url FROM links")
 	if err != nil {
 		fmt.Printf("query error: %v", err)
 		return nil, err
@@ -44,10 +42,11 @@ func getLinks(conn *pgx.Conn, ctx context.Context) ([]Link, error) {
 
 }
 
-func handleGetLinks(w http.ResponseWriter, r *http.Request, conn *pgx.Conn) {
+// by adding (s *Server) we're saying this function belongs to the Server struct
+func (s *Server) handleGetLinks(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 
-	links, err := getLinks(conn, ctx)
+	links, err := s.getLinks(ctx)
 	if err != nil {
 		fmt.Println("error", err)
 		http.Error(w, "internal server error", http.StatusInternalServerError)
