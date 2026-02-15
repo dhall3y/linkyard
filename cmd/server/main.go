@@ -11,6 +11,11 @@ import (
 	"github.com/joho/godotenv"
 )
 
+type Link struct {
+	name string
+	url  string
+}
+
 func main() {
 	err := godotenv.Load()
 	if err != nil {
@@ -32,21 +37,24 @@ func main() {
 		}
 		defer rows.Close()
 
+		var links []Link
+
 		for rows.Next() {
-			var name string
-			var url string
-			err := rows.Scan(&name, &url)
+			var newLink Link
+			err := rows.Scan(&newLink.name, &newLink.url)
 			if err != nil {
 				fmt.Printf("scan error: %v", err)
 				return
 			}
-			fmt.Printf("name: %s, url: %s \n", name, url)
+			links = append(links, newLink)
 		}
 
 		if rows.Err() != nil {
 			fmt.Printf("rows error: %v", rows.Err())
 			return
 		}
+
+		fmt.Printf("links: %+v", links)
 	})
 	http.ListenAndServe(":8000", nil)
 }
