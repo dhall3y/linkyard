@@ -22,22 +22,31 @@ func main() {
 	}
 	defer conn.Close(context.Background())
 
-	var name string
-	var url string
 
 	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
 		ctx := r.Context()
-		row := conn.QueryRow(ctx, "SELECT name, url FROM links")
-
-		err := row.Scan(&name, &url)
+		rows, err := conn.Query(ctx, "SELECT name, url FROM links")
 		if err != nil {
-			if err == pgx.ErrNoRows {
-				fmt.Println("no rows in table links")
-			}
+			fmt.Printf("query error : %v", err)
 			return
 		}
-		fmt.Println(name)
-		fmt.Println(url)
+		defer rows.Close()
+
+		for rows.Next() {
+			var name string
+			var url string
+			err := rows.Scan(&name, &url)
+			if err != nil {
+				fmt.Printf("scan error: %v", err)
+				return
+			}
+			fmt.Printf("name: %s, url: %s \n", name, url)
+		}
+
+		if rows.Err() != nil {
+			fmt.Printf("rows error: %v", rows.Err())
+			return
+		}
 	})
 	http.ListenAndServe(":8000", nil)
 }
