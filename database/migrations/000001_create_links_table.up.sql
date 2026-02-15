@@ -1,0 +1,11 @@
+CREATE TABLE IF NOT EXISTS categories (
+	id SERIAL PRIMARY KEY,
+	name TEXT NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS links (
+	id SERIAL PRIMARY KEY,
+	name TEXT NOT NULL,
+	url TEXT NOT NULL,
+	category_id INTEGER REFERENCES categories(id)
+);
