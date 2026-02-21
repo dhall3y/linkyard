@@ -33,7 +33,7 @@ func (s *Store) getLinks(ctx context.Context) ([]Link, error) {
 
 	for rows.Next() {
 		var newLink Link
-		err := rows.Scan(&newLink.Name, &newLink.Url)
+		err := rows.Scan(&newLink.Title, &newLink.URI)
 		if err != nil {
 			fmt.Printf("scan error: %v", err)
 			return nil, err
@@ -54,7 +54,7 @@ func (s *Store) createLink(ctx context.Context, link Link) (*Link, error) {
 	query := `INSERT INTO links (name, url) VALUES ($1, $2) RETURNING name, url`
 
 	var newLink Link
-	err := s.db.QueryRow(ctx, query, link.Name, link.Url).Scan(&newLink.Name, &newLink.Url)
+	err := s.db.QueryRow(ctx, query, link.Title, link.URI).Scan(&newLink.Title, &newLink.URI)
 	if err != nil {
 		if err == pgx.ErrNoRows {
 			fmt.Printf("no rows returned: %v", err)
