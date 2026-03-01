@@ -30,16 +30,16 @@ func (h *Handler) HandleImportLink(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	var newLinks []links.Link
-	rawLinks.goThroughLinks(nil, &newLinks, h.uuidGen)
+	var formatedLinks []links.Link
+	rawLinks.goThroughLinks(nil, &formatedLinks, h.uuidGen)
 
-	jsonResult, err := json.Marshal(newLinks)
+	newLinks, err := h.linksStore.BulkCreateLink(r.Context(), &formatedLinks)
 	if err != nil {
-		fmt.Println("failed to marshal result:", err)
+		fmt.Println("failed to insert formatedLinks into db:", err)
 		http.Error(w, "internal server error", http.StatusInternalServerError)
 		return
 	}
 
-	fmt.Println(string(jsonResult))
+	json.NewEncoder(w).Encode(newLinks)
 
 }

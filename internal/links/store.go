@@ -66,3 +66,34 @@ func (s *Store) createLink(ctx context.Context, link Link) (*Link, error) {
 
 	return &newLink, nil
 }
+
+func (s *Store) BulkCreateLink(ctx context.Context, links *[]Link) (*[]Link, error) {
+	count, err := s.db.CopyFrom(
+		ctx,
+		pgx.Identifier{"links"},
+		[]string{
+			"title",
+			"uri",
+			"type",
+			"created_at",
+			"updated_at",
+		},
+		pgx.CopyFromSlice(len(*links), func(i int) ([]any, error) {
+			return []any{
+				(*links)[i].Title,
+				(*links)[i].URI,
+				(*links)[i].Type,
+				(*links)[i].DateAdded,
+				(*links)[i].LastModified,
+			}, nil
+		}),
+	)
+	if err != nil {
+		fmt.Println("failed to bulk import:", err)
+		return nil, err
+	}
+
+	fmt.Printf("imported %d links", count)
+
+	return links, nil
+}
