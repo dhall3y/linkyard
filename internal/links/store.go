@@ -24,7 +24,7 @@ func NewStore(db *pgx.Conn) *Store {
 func (s *Store) getLinks(ctx context.Context) ([]Link, error) {
 	var links []Link
 
-	rows, err := s.db.Query(ctx, "SELECT name, url FROM links")
+	rows, err := s.db.Query(ctx, "SELECT title, uri FROM links")
 	if err != nil {
 		fmt.Printf("query error: %v", err)
 		return nil, err
@@ -51,7 +51,7 @@ func (s *Store) getLinks(ctx context.Context) ([]Link, error) {
 }
 
 func (s *Store) createLink(ctx context.Context, link Link) (*Link, error) {
-	query := `INSERT INTO links (name, url) VALUES ($1, $2) RETURNING name, url`
+	query := `INSERT INTO links (title, uri) VALUES ($1, $2) RETURNING title, uri`
 
 	var newLink Link
 	err := s.db.QueryRow(ctx, query, link.Title, link.URI).Scan(&newLink.Title, &newLink.URI)
