@@ -1,10 +1,12 @@
 package links
 
+import "time"
+
 type Link struct {
 	ID           string
 	Type         string
-	DateAdded    uint
-	LastModified uint
+	DateAdded    time.Time
+	LastModified time.Time
 	URI          string
 	Title        string
 	ParentID     string

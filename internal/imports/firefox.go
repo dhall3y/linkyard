@@ -3,6 +3,7 @@ package imports
 import (
 	"fmt"
 	"linkyard/internal/links"
+	"time"
 
 	"github.com/gofrs/uuid"
 )
@@ -10,8 +11,8 @@ import (
 type FirefoxLink struct {
 	ID           *uuid.UUID    `json:"-"`
 	TypeCode     uint8         `json:"typeCode"`
-	DateAdded    uint          `json:"dateAdded"`
-	LastModified uint          `json:"lastModified"`
+	DateAdded    int64         `json:"dateAdded"`
+	LastModified int64         `json:"lastModified"`
 	URI          string        `json:"uri"`
 	Title        string        `json:"title"`
 	Children     []FirefoxLink `json:"children"`
@@ -39,8 +40,8 @@ func (f *FirefoxLink) format() *links.Link {
 	newLink := links.Link{
 		Title:        f.Title,
 		URI:          f.URI,
-		DateAdded:    f.DateAdded,
-		LastModified: f.LastModified,
+		DateAdded:    time.UnixMicro(f.DateAdded),
+		LastModified: time.UnixMicro(f.LastModified),
 	}
 
 	if f.ParentID != nil {
